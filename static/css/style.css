@@ -1,0 +1,242 @@
+/* ── Variables ─────────────────────────────────────────── */
+:root {
+  --bg:       #0f1612;
+  --surface:  #161e1a;
+  --surface2: #1e2b24;
+  --border:   #2a3d32;
+  --green:    #4ade80;
+  --green2:   #22c55e;
+  --amber:    #fbbf24;
+  --red:      #f87171;
+  --text:     #e8f0eb;
+  --muted:    #6b8c78;
+  --font-h:   'Syne', sans-serif;
+  --font-m:   'DM Mono', monospace;
+}
+
+/* ── Reset & Base ─────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-m);
+  font-size: 14px;
+  min-height: 100vh;
+}
+a { color: var(--green); text-decoration: none; }
+
+/* ── Nav ──────────────────────────────────────────────── */
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  height: 60px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.nav-brand {
+  font-family: var(--font-h);
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: var(--green);
+  letter-spacing: -0.5px;
+}
+.nav-links { display: flex; gap: 1.5rem; }
+.nav-links a {
+  color: var(--muted);
+  font-family: var(--font-h);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: color 0.2s;
+  padding: 4px 0;
+  border-bottom: 2px solid transparent;
+}
+.nav-links a:hover,
+.nav-links a.active { color: var(--green); border-bottom-color: var(--green); }
+
+/* ── Main layout ──────────────────────────────────────── */
+main { max-width: 1000px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+.page-header { margin-bottom: 2rem; }
+.page-header h1 {
+  font-family: var(--font-h);
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -1px;
+}
+.page-header .subtitle { color: var(--muted); margin-top: 4px; }
+
+/* ── KPI Cards ────────────────────────────────────────── */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  transition: border-color 0.2s, transform 0.15s;
+}
+.card:hover { border-color: var(--green); transform: translateY(-2px); }
+.card-warn  { border-left: 3px solid var(--amber); }
+.card-good  { border-left: 3px solid var(--green); }
+.card-icon  { font-size: 1.5rem; margin-bottom: 0.5rem; }
+.card-label { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
+.card-value {
+  font-family: var(--font-h);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-top: 4px;
+}
+
+/* ── Sections ─────────────────────────────────────────── */
+.section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.section h2 {
+  font-family: var(--font-h);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1.25rem;
+  letter-spacing: -0.3px;
+}
+
+/* ── Bar chart (vertical) ──────────────────────────────── */
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  height: 160px;
+  padding-bottom: 8px;
+}
+.bar-wrap  { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+.bar-val   { font-size: 11px; color: var(--muted); }
+.bar {
+  width: 100%;
+  background: linear-gradient(180deg, var(--green2), var(--green));
+  border-radius: 4px 4px 0 0;
+  min-height: 4px;
+  transition: height 0.4s ease;
+}
+.bar-label { font-size: 11px; color: var(--muted); }
+
+/* ── Data table ───────────────────────────────────────── */
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table th {
+  text-align: left;
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 0 12px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.data-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: var(--surface2); }
+
+/* ── Badges ───────────────────────────────────────────── */
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+}
+.badge-good { background: #14532d; color: var(--green);  }
+.badge-mid  { background: #451a03; color: var(--amber); }
+.badge-bad  { background: #450a0a; color: var(--red);   }
+
+/* ── Forms ────────────────────────────────────────────── */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+.form-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.75rem;
+}
+.form-card h2 {
+  font-family: var(--font-h);
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+}
+.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1rem; }
+.form-group label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; }
+.form-group input {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--text);
+  font-family: var(--font-m);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-group input:focus { border-color: var(--green); }
+.btn {
+  width: 100%;
+  padding: 12px;
+  background: var(--green2);
+  color: #0a1a10;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--font-h);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  margin-top: 0.5rem;
+}
+.btn:hover   { background: var(--green); }
+.btn:active  { transform: scale(0.98); }
+.msg { min-height: 24px; font-size: 13px; margin-top: 10px; }
+.msg.ok    { color: var(--green); }
+.msg.error { color: var(--red); }
+
+/* ── Horizontal bar chart (reports) ──────────────────── */
+.h-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.h-bar-label { width: 160px; font-size: 13px; color: var(--text); flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.h-bar-track { flex: 1; background: var(--surface2); border-radius: 4px; height: 12px; overflow: hidden; }
+.h-bar-fill  { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+.h-bar-fill-good { background: var(--green2); }
+.h-bar-fill-mid  { background: var(--amber); }
+.h-bar-fill-bad  { background: var(--red); }
+.h-bar-pct  { width: 44px; text-align: right; font-size: 12px; color: var(--muted); flex-shrink: 0; }
+
+/* ── Responsive ───────────────────────────────────────── */
+@media (max-width: 600px) {
+  nav { padding: 0 1rem; }
+  main { padding: 1.25rem 1rem 3rem; }
+  .cards { grid-template-columns: 1fr 1fr; }
+  .page-header h1 { font-size: 1.5rem; }
+}

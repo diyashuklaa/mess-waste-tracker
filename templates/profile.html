@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Profile – MessTrack{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>My Profile</h1>
+  <p class="subtitle">Manage your account details</p>
+</div>
+
+<div class="profile-grid">
+
+  <!-- Avatar + stats -->
+  <div class="profile-left">
+    <div class="avatar" id="avatar-circle">?</div>
+    <div class="profile-name" id="p-name">Loading…</div>
+    <div class="profile-role-badge" id="p-role"></div>
+    <div class="profile-username" id="p-username"></div>
+    <div class="profile-joined" id="p-joined"></div>
+
+    <div class="stat-row">
+      <div class="stat-box">
+        <div class="stat-val" id="s-logs">—</div>
+        <div class="stat-label">Daily Logs</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="s-dishes">—</div>
+        <div class="stat-label">Dish Entries</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="s-wasted">—</div>
+        <div class="stat-label">kg Tracked</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit form -->
+  <div class="profile-right">
+    <div class="form-card">
+      <h2>✏️ Edit Profile</h2>
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="edit-name" placeholder="Your full name"/>
+      </div>
+      <div class="form-group">
+        <label>Role</label>
+        <select id="edit-role">
+          <option value="Student">Student</option>
+          <option value="Mess Staff">Mess Staff</option>
+          <option value="Admin">Admin</option>
+        </select>
+      </div>
+      <button class="btn" onclick="saveProfile()">Save Changes</button>
+      <div class="msg" id="edit-msg"></div>
+    </div>
+
+    <div class="form-card" style="margin-top:1rem">
+      <h2>🚪 Account</h2>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:1rem">
+        You are currently signed in. Click below to log out.
+      </p>
+      <a href="/logout" class="btn btn-danger">Logout</a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function loadProfile() {
+  const data = await fetch("/api/profile").then(r => r.json());
+
+  const initials = (data.full_name || data.username).split(" ").map(w => w[0]).join("").toUpperCase().slice(0,2);
+  document.getElementById("avatar-circle").textContent = initials || "?";
+  document.getElementById("p-name").textContent     = data.full_name || data.username;
+  document.getElementById("p-role").textContent     = data.role;
+  document.getElementById("p-username").textContent = "@" + data.username;
+  document.getElementById("p-joined").textContent   = "Joined " + data.joined_date;
+  document.getElementById("s-logs").textContent     = data.total_logs;
+  document.getElementById("s-dishes").textContent   = data.total_dishes;
+  document.getElementById("s-wasted").textContent   = data.total_wasted + " kg";
+
+  // Pre-fill edit form
+  document.getElementById("edit-name").value  = data.full_name;
+  document.getElementById("edit-role").value  = data.role;
+}
+
+async function saveProfile() {
+  const full_name = document.getElementById("edit-name").value.trim();
+  const role      = document.getElementById("edit-role").value;
+  const res  = await fetch("/api/profile", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ full_name, role })
+  });
+  const data = await res.json();
+  const msg  = document.getElementById("edit-msg");
+  if (res.ok) {
+    msg.textContent = "✅ Profile updated!";
+    msg.className   = "msg ok";
+    loadProfile();
+  } else {
+    msg.textContent = data.error;
+    msg.className   = "msg error";
+  }
+  setTimeout(() => msg.textContent = "", 3000);
+}
+
+loadProfile();
+</script>
+{% endblock %}

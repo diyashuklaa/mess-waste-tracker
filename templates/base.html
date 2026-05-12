@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}Mess Waste Tracker{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css"/>
+</head>
+<body>
+  <nav>
+    <div class="nav-brand">🌿 MessTrack</div>
+    <div class="nav-links">
+      <a href="/"       {% if request.path == '/'       %}class="active"{% endif %}>Dashboard</a>
+      <a href="/log"    {% if request.path == '/log'    %}class="active"{% endif %}>Log Entry</a>
+      <a href="/report" {% if request.path == '/report' %}class="active"{% endif %}>Reports</a>
+      <a href="/profile"{% if request.path == '/profile'%}class="active"{% endif %}>👤 Profile</a>
+    </div>
+  </nav>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <script src="/static/js/main.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Reports – MessTrack{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Weekly Reports</h1>
+  <p class="subtitle">Compare waste across weeks & dishes</p>
+</div>
+
+<!-- Weekly comparison table -->
+<div class="section">
+  <h2>📆 Weekly Waste Comparison</h2>
+  <table class="data-table">
+    <thead>
+      <tr><th>Week</th><th>Total Plates</th><th>Served (kg)</th><th>Wasted (kg)</th><th>Waste %</th></tr>
+    </thead>
+    <tbody id="weekly-tbody"><tr><td colspan="5">Loading…</td></tr></tbody>
+  </table>
+</div>
+
+<!-- Dish ranking -->
+<div class="section">
+  <h2>🍽️ All Dishes — Waste Ranking</h2>
+  <div id="dish-bars"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function loadReports() {
+  // Weekly
+  const weeks = await fetch("/api/weekly").then(r => r.json());
+  const wtbody = document.getElementById("weekly-tbody");
+  if (!weeks.length) {
+    wtbody.innerHTML = "<tr><td colspan='5'>No data yet.</td></tr>";
+  } else {
+    wtbody.innerHTML = weeks.map(w => {
+      const pct = w.total_served ? ((w.total_wasted / w.total_served) * 100).toFixed(1) : "—";
+      return `<tr>
+        <td>${w.week}</td>
+        <td>${w.total_plates}</td>
+        <td>${w.total_served.toFixed(1)}</td>
+        <td>${w.total_wasted.toFixed(1)}</td>
+        <td><span class="badge ${pct < 10 ? 'badge-good' : pct < 25 ? 'badge-mid' : 'badge-bad'}">${pct}%</span></td>
+      </tr>`;
+    }).join("");
+  }
+
+  // Dish bars
+  const dishes = await fetch("/api/dish/summary").then(r => r.json());
+  const container = document.getElementById("dish-bars");
+  if (!dishes.length) {
+    container.innerHTML = "<p style='color:var(--muted)'>No dish data recorded yet.</p>";
+    return;
+  }
+  const max = Math.max(...dishes.map(d => d.waste_pct || 0), 1);
+  container.innerHTML = dishes.map(d => {
+    const pct = d.waste_pct ?? 0;
+    const w   = Math.round((pct / max) * 100);
+    const cls = pct < 10 ? "bar-fill-good" : pct < 25 ? "bar-fill-mid" : "bar-fill-bad";
+    return `<div class="h-bar-row">
+      <div class="h-bar-label">${d.dish_name}</div>
+      <div class="h-bar-track">
+        <div class="h-bar-fill ${cls}" style="width:${w}%"></div>
+      </div>
+      <div class="h-bar-pct">${pct}%</div>
+    </div>`;
+  }).join("");
+}
+loadReports();
+</script>
+{% endblock %}

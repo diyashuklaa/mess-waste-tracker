@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Log Entry – MessTrack{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Log Entry</h1>
+  <p class="subtitle">Record today's mess data</p>
+</div>
+
+<div class="form-grid">
+
+  <!-- Daily log form -->
+  <div class="form-card">
+    <h2>📅 Daily Summary</h2>
+    <div class="form-group">
+      <label>Date</label>
+      <input type="date" id="d-date" />
+    </div>
+    <div class="form-group">
+      <label>Plates Used</label>
+      <input type="number" id="d-plates" placeholder="e.g. 320" min="0" />
+    </div>
+    <div class="form-group">
+      <label>Food Served (kg)</label>
+      <input type="number" id="d-served" placeholder="e.g. 85.5" step="0.1" min="0" />
+    </div>
+    <div class="form-group">
+      <label>Food Wasted (kg)</label>
+      <input type="number" id="d-wasted" placeholder="e.g. 12.0" step="0.1" min="0" />
+    </div>
+    <button class="btn" onclick="saveDaily()">Save Daily Log</button>
+    <div class="msg" id="d-msg"></div>
+  </div>
+
+  <!-- Dish log form -->
+  <div class="form-card">
+    <h2>🍛 Dish Waste Entry</h2>
+    <div class="form-group">
+      <label>Date</label>
+      <input type="date" id="dish-date" />
+    </div>
+    <div class="form-group">
+      <label>Dish Name</label>
+      <input type="text" id="dish-name" placeholder="e.g. Dal Makhani" />
+    </div>
+    <div class="form-group">
+      <label>Served (kg)</label>
+      <input type="number" id="dish-served" placeholder="e.g. 20.0" step="0.1" min="0" />
+    </div>
+    <div class="form-group">
+      <label>Wasted (kg)</label>
+      <input type="number" id="dish-wasted" placeholder="e.g. 2.5" step="0.1" min="0" />
+    </div>
+    <button class="btn" onclick="saveDish()">Save Dish Entry</button>
+    <div class="msg" id="dish-msg"></div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Pre-fill today's date
+const today = new Date().toISOString().split("T")[0];
+document.getElementById("d-date").value    = today;
+document.getElementById("dish-date").value = today;
+
+async function saveDaily() {
+  const body = {
+    date:        document.getElementById("d-date").value,
+    plates_used: +document.getElementById("d-plates").value,
+    food_served: +document.getElementById("d-served").value,
+    food_wasted: +document.getElementById("d-wasted").value,
+  };
+  if (!body.plates_used && !body.food_served && !body.food_wasted)
+    return showMsg("d-msg", "Please fill in the fields.", "error");
+  await fetch("/api/daily", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body) });
+  showMsg("d-msg", "✅ Daily log saved!", "ok");
+}
+
+async function saveDish() {
+  const body = {
+    date:      document.getElementById("dish-date").value,
+    dish_name: document.getElementById("dish-name").value.trim(),
+    served_kg: +document.getElementById("dish-served").value,
+    wasted_kg: +document.getElementById("dish-wasted").value,
+  };
+  if (!body.dish_name) return showMsg("dish-msg", "Please enter a dish name.", "error");
+  await fetch("/api/dish", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body) });
+  showMsg("dish-msg", "✅ Dish entry saved!", "ok");
+  document.getElementById("dish-name").value   = "";
+  document.getElementById("dish-served").value = "";
+  document.getElementById("dish-wasted").value = "";
+}
+
+function showMsg(id, text, type) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = "msg " + type;
+  setTimeout(() => el.textContent = "", 3000);
+}
+</script>
+{% endblock %}

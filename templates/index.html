@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Dashboard – MessTrack{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Waste Dashboard</h1>
+  <p class="subtitle">Last 7 days at a glance</p>
+</div>
+
+<!-- KPI cards -->
+<div class="cards">
+  <div class="card" id="card-plates">
+    <div class="card-icon">🍽️</div>
+    <div class="card-label">Total Plates</div>
+    <div class="card-value" id="kpi-plates">—</div>
+  </div>
+  <div class="card" id="card-served">
+    <div class="card-icon">🥘</div>
+    <div class="card-label">Food Served (kg)</div>
+    <div class="card-value" id="kpi-served">—</div>
+  </div>
+  <div class="card card-warn" id="card-wasted">
+    <div class="card-icon">🗑️</div>
+    <div class="card-label">Food Wasted (kg)</div>
+    <div class="card-value" id="kpi-wasted">—</div>
+  </div>
+  <div class="card card-good" id="card-pct">
+    <div class="card-icon">📊</div>
+    <div class="card-label">Waste %</div>
+    <div class="card-value" id="kpi-pct">—</div>
+  </div>
+</div>
+
+<!-- Daily bar chart (pure CSS/JS, no lib needed) -->
+<div class="section">
+  <h2>Daily Waste (kg) — Last 7 Days</h2>
+  <div class="bar-chart" id="bar-chart"></div>
+</div>
+
+<!-- Best dishes table -->
+<div class="section">
+  <h2>🏆 Least-Waste Dishes</h2>
+  <table class="data-table" id="dish-table">
+    <thead>
+      <tr><th>Dish</th><th>Served (kg)</th><th>Wasted (kg)</th><th>Waste %</th></tr>
+    </thead>
+    <tbody id="dish-tbody"><tr><td colspan="4">Loading…</td></tr></tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function loadDashboard() {
+  // KPIs from daily logs
+  const daily = await fetch("/api/daily?days=7").then(r => r.json());
+  if (daily.length) {
+    const plates = daily.reduce((s, r) => s + r.plates_used, 0);
+    const served = daily.reduce((s, r) => s + r.food_served, 0);
+    const wasted = daily.reduce((s, r) => s + r.food_wasted, 0);
+    const pct    = served ? ((wasted / served) * 100).toFixed(1) : 0;
+    document.getElementById("kpi-plates").textContent = plates.toLocaleString();
+    document.getElementById("kpi-served").textContent = served.toFixed(1);
+    document.getElementById("kpi-wasted").textContent = wasted.toFixed(1);
+    document.getElementById("kpi-pct").textContent    = pct + "%";
+
+    // Bar chart
+    const max = Math.max(...daily.map(r => r.food_wasted), 0.1);
+    const chart = document.getElementById("bar-chart");
+    chart.innerHTML = daily.map(r => {
+      const h = Math.round((r.food_wasted / max) * 120);
+      const label = r.log_date.slice(5); // MM-DD
+      return `<div class="bar-wrap">
+        <div class="bar-val">${r.food_wasted.toFixed(1)}</div>
+        <div class="bar" style="height:${h}px"></div>
+        <div class="bar-label">${label}</div>
+      </div>`;
+    }).join("");
+  }
+
+  // Dish summary
+  const dishes = await fetch("/api/dish/summary").then(r => r.json());
+  const tbody = document.getElementById("dish-tbody");
+  if (dishes.length === 0) {
+    tbody.innerHTML = "<tr><td colspan='4'>No dish data yet. Add entries in Log.</td></tr>";
+  } else {
+    tbody.innerHTML = dishes.map(d => `
+      <tr>
+        <td>${d.dish_name}</td>
+        <td>${d.total_served.toFixed(1)}</td>
+        <td>${d.total_wasted.toFixed(1)}</td>
+        <td><span class="badge ${d.waste_pct < 10 ? 'badge-good' : d.waste_pct < 25 ? 'badge-mid' : 'badge-bad'}">${d.waste_pct ?? 0}%</span></td>
+      </tr>`).join("");
+  }
+}
+loadDashboard();
+</script>
+{% endblock %}
