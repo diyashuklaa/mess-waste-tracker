@@ -1,92 +1,63 @@
-# 🌿 MessTrack — College Mess Food Waste Tracker
+ # MessTrack
 
-A beginner-friendly full-stack app built with **Flask + SQLite + Vanilla JS**.
+A simple web application to monitor and analyze food waste in college mess facilities.
 
----
+Built using Flask, SQLite, HTML, CSS, and JavaScript, this project helps track:
 
-## 📁 Project Structure
+* daily food served vs wasted
+* dish-wise waste statistics
+* weekly waste trends
 
-```
-mess-waste-tracker/
-├── app.py                   ← Flask backend (all routes + DB logic)
-├── mess.db                  ← SQLite database (auto-created on first run)
-├── requirements.txt
-├── templates/
-│   ├── base.html            ← Shared nav + layout
-│   ├── index.html           ← Dashboard (KPIs + charts + dish table)
-│   ├── log.html             ← Form to add daily/dish entries
-│   └── report.html          ← Weekly comparison + dish ranking
-└── static/
-    ├── css/style.css
-    └── js/main.js
-```
+The goal of the project is to encourage smarter food management and reduce unnecessary waste in college cafeterias.
 
 ---
 
-## 🗄️ Database Schema (2 tables only)
+## Features
 
-```sql
--- One row per day
-CREATE TABLE daily_log (
-    id          INTEGER PRIMARY KEY AUTOINCREMENT,
-    log_date    TEXT    NOT NULL UNIQUE,   -- e.g. "2024-06-10"
-    plates_used INTEGER DEFAULT 0,
-    food_served REAL    DEFAULT 0,         -- kg
-    food_wasted REAL    DEFAULT 0          -- kg
-);
-
--- One row per dish per day (can have many)
-CREATE TABLE dish_log (
-    id          INTEGER PRIMARY KEY AUTOINCREMENT,
-    log_date    TEXT NOT NULL,
-    dish_name   TEXT NOT NULL,
-    served_kg   REAL DEFAULT 0,
-    wasted_kg   REAL DEFAULT 0
-);
-```
+* Daily mess waste logging
+* Dish-wise waste tracking
+* Weekly analytics dashboard
+* Simple and beginner-friendly UI
+* SQLite database integration
+* REST API based backend using Flask
 
 ---
 
-## 🔌 API Routes
+## Tech Stack
 
-| Method | Route              | Purpose                        |
-|--------|--------------------|--------------------------------|
-| POST   | `/api/daily`       | Save / update daily log        |
-| GET    | `/api/daily`       | Get last N days (default: 7)   |
-| POST   | `/api/dish`        | Add dish waste entry           |
-| GET    | `/api/dish/summary`| Dish waste % ranking           |
-| GET    | `/api/weekly`      | Weekly aggregated comparison   |
+* Python (Flask)
+* SQLite
+* HTML
+* CSS
+* Vanilla JavaScript
 
 ---
 
-## 🚀 Setup & Run
+## Run Locally
 
 ```bash
-# 1. Install Flask
 pip install flask
-
-# 2. Run the app
 python app.py
+```
 
-# 3. Open in browser
+Open in browser:
+
+```bash
 http://127.0.0.1:5000
 ```
 
-That's it! SQLite database (`mess.db`) is created automatically.
+---
+
+## Future Improvements
+
+* Interactive charts
+* CSV/PDF report export
+* AI-based waste prediction
 
 ---
 
-## 📖 How to Use
+## Author
 
-1. **Log Entry** (`/log`) — Fill in daily totals (plates, kg served/wasted) and individual dish entries.
-2. **Dashboard** (`/`) — See 7-day KPIs, a daily waste bar chart, and which dishes waste least.
-3. **Reports** (`/report`) — Compare waste across weeks and rank all dishes by waste percentage.
+Diya Shukla
 
----
 
-## 💡 Beginner Tips
-
-- No ORM needed — plain `sqlite3` module is used throughout.
-- No JavaScript framework — everything is plain `fetch()` + DOM manipulation.
-- No build step — just run `python app.py` and go.
-- To reset all data: delete `mess.db` and restart the server.
